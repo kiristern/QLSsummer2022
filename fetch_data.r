@@ -25,6 +25,7 @@ spe
 
 # investigate data
 gene_meta <- rowData(spe)
+head(gene_meta)
 write.csv(gene_meta, "projects/spatialLIBD/data/gene_meta.csv")
 
 # counts matrix
@@ -44,6 +45,7 @@ write.csv(csr_logcounts, file = "projects/spatialLIBD/data/spatialLIBD_csr_logco
 # get col metadata
 spot_meta <- colData(spe)
 head(spot_meta)
+colnames(spot_meta)
 write.csv(spot_meta, "projects/spatialLIBD/data/spatialLIBD_spot_meta.csv")
 
 spot_st <- spatialCoords(spe)
@@ -53,6 +55,7 @@ write.csv(spot_st, "projects/spatialLIBD/data/spatialLIBD_spot_st.csv")
 
 ##### SingleCellExperiment data #####
 sce <- fetch_data(type = 'sce')
+sce
 
 # create csr
 genexcell <- assays(sce)
@@ -77,6 +80,58 @@ cell_meta <- colData(sce)
 head(cell_meta)
 write.csv(cell_meta, "projects/spatialLIBD/data/spatialLIBD_cell_meta.csv")
 
-cell_st <- spatialCoords(sce)
-head(cell_st)
-write.csv(cell_st, "projects/spatialLIBD/data/spatialLIBD_cell_st.csv")
+# layer-level data
+sce_layer <- fetch_data(type="sce_layer")
+sce_layer
+head(rowData(sce_layer))
+head(colData(sce_layer))
+
+
+
+## Connect to ExperimentHub
+ehub <- ExperimentHub::ExperimentHub()
+
+# results from 'enrichment model' (t-stat: assess whether gene had higher expression in a given layer compared to the rest);
+#              'pariwise model' (t-stat: assess whether gene had higher expression between one layer and another layer);
+#              'anova model' (F-stat: expression variability across all layers)
+modeling_results <- fetch_data("modeling_results", eh = ehub)
+
+## list of modeling result tables
+sapply(modeling_results, class)
+sapply(modeling_results, dim)
+
+sapply(modeling_results, function(x) {
+    head(colnames(x))
+})
+
+## Convert modeling stats from wide to long format and extract significant genes
+## This takes a few seconds to run
+system.time(
+    sig_genes <-
+        sig_genes_extract_all(
+            n = nrow(sce_layer),
+            modeling_results = modeling_results,
+            sce_layer = sce_layer
+        )
+)
+head(sig_genes) # see http://research.libd.org/spatialLIBD/articles/spatialLIBD.html#extract-significant-genes for col details
+
+## Explore the enrichment t-statistics derived from Tran et al's snRNA-seq
+## DLPFC data
+dim(tstats_Human_DLPFC_snRNAseq_Nguyen_topLayer)
+
+## Compute the correlation matrix of enrichment t-statistics between our data
+## and Tran et al's snRNA-seq data
+cor_stats_layer <- layer_stat_cor(
+    tstats_Human_DLPFC_snRNAseq_Nguyen_topLayer,
+    modeling_results,
+    "enrichment"
+)
+
+
+## Visualize the estimated number of cells per spot
+vis_gene(
+    spe = spe,
+    sampleid = "151673",
+    geneid = "cell_count"
+)
