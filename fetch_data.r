@@ -116,9 +116,11 @@ system.time(
 )
 head(sig_genes) # see http://research.libd.org/spatialLIBD/articles/spatialLIBD.html#extract-significant-genes for col details
 
+## Correlation of layer-level statistics 
 ## Explore the enrichment t-statistics derived from Tran et al's snRNA-seq
 ## DLPFC data
 dim(tstats_Human_DLPFC_snRNAseq_Nguyen_topLayer)
+head(tstats_Human_DLPFC_snRNAseq_Nguyen_topLayer)
 
 ## Compute the correlation matrix of enrichment t-statistics between our data
 ## and Tran et al's snRNA-seq data
@@ -127,11 +129,16 @@ cor_stats_layer <- layer_stat_cor(
     modeling_results,
     "enrichment"
 )
+head(cor_stats_layer)
+
+## Visualize the correlation matrix
+layer_stat_cor_plot(cor_stats_layer, max = max(cor_stats_layer))
+
+# ## Visualize the estimated number of cells per spot
+# vis_gene(
+#     spe = spe,
+#     sampleid = "151673",
+#     geneid = "cell_count"
+# )
 
 
-## Visualize the estimated number of cells per spot
-vis_gene(
-    spe = spe,
-    sampleid = "151673",
-    geneid = "cell_count"
-)
