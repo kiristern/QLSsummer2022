@@ -1,13 +1,16 @@
-setwd('Desktop/')
-getwd()
+.libPaths('/projects/kster/.conda/envs/libd')
 
-# if (!requireNamespace("BiocManager", quietly = TRUE)) {
-#     install.packages("BiocManager")
-# }
+install.packages("jsonlite", "/projects/kster/.conda/envs/libd")
+install.packages("languageserver", "/projects/kster/.conda/envs/libd")
+install.packages("httpgd", "/projects/kster/.conda/envs/libd")
 
-# BiocManager::install("spatialLIBD")
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager", "/projects/kster/.conda/envs/libd")
+}
+BiocManager::install("spatialLIBD")
 
 ## Load the package
+library("jsonlite")
 library("spatialLIBD")
 
 create_csr <- function(mat){
@@ -53,32 +56,6 @@ head(spot_st)
 write.csv(spot_st, "projects/spatialLIBD/data/spatialLIBD_spot_st.csv")
 
 
-##### SingleCellExperiment data #####
-sce <- fetch_data(type = 'sce')
-sce
-
-# create csr
-genexcell <- assays(sce)
-genexcell_count <- genexcell$counts
-genexcell_logcount <- genexcell$logcounts
-
-# count matrix
-csr_counts_cell <- create_csr(genexcell_count)
-head(csr_counts_cell)
-write.csv(csr_counts_cell, "projects/spatialLIBD/data/spatialLIBD_csr_counts_cell.csv")
-
-csr_logcounts_cell <- create_csr(genexcell_logcount)
-head(csr_logcounts_cell)
-write.csv(csr_logcounts_cell, file = "projects/spatialLIBD/data/spatialLIBD_csr_logcounts_cell.csv")
-
-# gene meta
-gene_meta_sce <- rowData(sce)
-write.csv(gene_meta_sce, "projects/spatialLIBD/data/gene_meta_sce.csv")
-
-# get col metadata
-cell_meta <- colData(sce)
-head(cell_meta)
-write.csv(cell_meta, "projects/spatialLIBD/data/spatialLIBD_cell_meta.csv")
 
 # layer-level data
 sce_layer <- fetch_data(type="sce_layer")
@@ -140,5 +117,4 @@ layer_stat_cor_plot(cor_stats_layer, max = max(cor_stats_layer))
 #     sampleid = "151673",
 #     geneid = "cell_count"
 # )
-
 
