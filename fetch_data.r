@@ -118,3 +118,5 @@ layer_stat_cor_plot(cor_stats_layer, max = max(cor_stats_layer))
 #     geneid = "cell_count"
 # )
 
+
+# download cell types from: https://libd.shinyapps.io/tran2021_DLPFC/# Export > Download panel output > Row data table 1
