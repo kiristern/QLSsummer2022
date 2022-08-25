@@ -13,10 +13,11 @@ BiocManager::install("spatialLIBD")
 library("jsonlite")
 library("spatialLIBD")
 
-create_csr <- function(mat){
+create_csr <- function(mat, spot_meta){
     csr_count <- summary(mat)
     csr_counts <- data.frame(gene = rownames(genexspot_count)[csr_count$i], 
                         spot = colnames(genexspot_count)[csr_count$j],
+                        sample_id = spot_meta[,'sample_id'][csr_count$j],
                         count = csr_count$x)
 }
 
@@ -36,15 +37,6 @@ genexspot <- assays(spe)
 genexspot_count <- genexspot$counts
 genexspot_logcount <- genexspot$logcounts
 
-# create csr
-csr_counts <- create_csr(genexspot_count)
-head(csr_counts)
-write.csv(csr_counts, "projects/spatialLIBD/data/spatialLIBD_csr_counts.csv")
-
-csr_logcounts <- create_csr(genexspot_logcount)
-head(csr_logcounts)
-write.csv(csr_logcounts, file = "projects/spatialLIBD/data/spatialLIBD_csr_logcounts.csv")
-
 # get col metadata
 spot_meta <- colData(spe)
 head(spot_meta)
@@ -55,6 +47,14 @@ spot_st <- spatialCoords(spe)
 head(spot_st)
 write.csv(spot_st, "projects/spatialLIBD/data/spatialLIBD_spot_st.csv")
 
+# create csr
+csr_counts <- create_csr(genexspot_count, spot_meta)
+head(csr_counts)
+write.csv(csr_counts, "projects/spatialLIBD/data/spatialLIBD_csr_counts.csv")
+
+csr_logcounts <- create_csr(genexspot_logcount, spot_meta)
+head(csr_logcounts)
+write.csv(csr_logcounts, file = "projects/spatialLIBD/data/spatialLIBD_csr_logcounts.csv")
 
 
 # layer-level data
