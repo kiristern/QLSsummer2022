@@ -4,9 +4,9 @@ install.packages("jsonlite", "/projects/kster/.conda/envs/libd")
 install.packages("languageserver", "/projects/kster/.conda/envs/libd")
 install.packages("httpgd", "/projects/kster/.conda/envs/libd")
 
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
-    install.packages("BiocManager", "/projects/kster/.conda/envs/libd")
-}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
 BiocManager::install("spatialLIBD")
 
 ## Load the package
